@@ -1,0 +1,99 @@
+[
+  {
+    "id": 1, "slug": "boof-e-koor", "genre": "roman",
+    "title": "بوف کور", "author": "صادق هدایت", "narrator": "با صدای رضا کریمی",
+    "cover": "🌙", "coverBg": "linear-gradient(135deg,#2d1b4e,#194878)",
+    "tag": "رمان و داستان", "rate": "۴.۸",
+    "mode": "single",
+    "audioFile": "audio/boof-e-koor.mp3",
+    "duration": "۳ ساعت ۲۰ دقیقه", "durationSec": 12000
+  },
+  {
+    "id": 2, "slug": "ghodrat-e-hal", "genre": "personal",
+    "title": "قدرت حال", "author": "اکهارت تول", "narrator": "با صدای سارا احمدی",
+    "cover": "☀️", "coverBg": "linear-gradient(135deg,#11569A,#1873C4)",
+    "tag": "توسعه فردی", "rate": "۴.۹",
+    "mode": "chapters",
+    "chapters": [
+      { "title": "فصل ۱ — لحظه حال", "file": "audio/ghodrat-e-hal-ch1.mp3", "durationSec": 2100 },
+      { "title": "فصل ۲ — ذهن و هویت", "file": "audio/ghodrat-e-hal-ch2.mp3", "durationSec": 2400 },
+      { "title": "فصل ۳ — رهایی از درد", "file": "audio/ghodrat-e-hal-ch3.mp3", "durationSec": 1980 },
+      { "title": "فصل ۴ — هشیاری", "file": "audio/ghodrat-e-hal-ch4.mp3", "durationSec": 2250 }
+    ],
+    "duration": "۵ ساعت ۱۰ دقیقه", "durationSec": 18600
+  },
+  {
+    "id": 3, "slug": "sapiens", "genre": "history",
+    "title": "سپیان", "author": "یووال نوح هراری", "narrator": "با صدای امیر طاهری",
+    "cover": "🦴", "coverBg": "linear-gradient(135deg,#194878,#5A8FB5)",
+    "tag": "تاریخ و فلسفه", "rate": "۴.۷",
+    "mode": "chapters",
+    "chapters": [
+      { "title": "فصل ۱ — انقلاب شناختی", "file": "audio/sapiens-ch1.mp3", "durationSec": 3600 },
+      { "title": "فصل ۲ — انقلاب کشاورزی", "file": "audio/sapiens-ch2.mp3", "durationSec": 4200 },
+      { "title": "فصل ۳ — یکپارچگی بشر", "file": "audio/sapiens-ch3.mp3", "durationSec": 3900 },
+      { "title": "فصل ۴ — انقلاب علمی", "file": "audio/sapiens-ch4.mp3", "durationSec": 4500 },
+      { "title": "فصل ۵ — رضایت بشر", "file": "audio/sapiens-ch5.mp3", "durationSec": 3300 },
+      { "title": "فصل ۶ — آینده انسان", "file": "audio/sapiens-ch6.mp3", "durationSec": 4000 },
+      { "title": "فصل ۷ — جمع‌بندی", "file": "audio/sapiens-ch7.mp3", "durationSec": 4100 },
+      { "title": "فصل ۸ — پرسش‌های پایانی", "file": "audio/sapiens-ch8.mp3", "durationSec": 3900 }
+    ],
+    "duration": "۸ ساعت ۴۵ دقیقه", "durationSec": 31500
+  },
+  {
+    "id": 4, "slug": "divan-e-hafez", "genre": "poetry",
+    "title": "دیوان حافظ", "author": "خواجه شمس‌الدین حافظ", "narrator": "با صدای محمد رضایی",
+    "cover": "🌹", "coverBg": "linear-gradient(135deg,#0D2A4A,#11569A)",
+    "tag": "شعر و ادبیات", "rate": "۴.۹",
+    "mode": "single",
+    "audioFile": "audio/divan-e-hafez.mp3",
+    "duration": "۲ ساعت ۵۰ دقیقه", "durationSec": 10200
+  },
+  {
+    "id": 5, "slug": "physics-for-everyone", "genre": "science",
+    "title": "فیزیک نظری برای همه", "author": "ریچارد فاینمن", "narrator": "با صدای نیما کاظمی",
+    "cover": "⚛️", "coverBg": "linear-gradient(135deg,#1E5C9E,#4A90D9)",
+    "tag": "علمی و آموزشی", "rate": "۴.۶",
+    "mode": "single",
+    "audioFile": "audio/physics-for-everyone.mp3",
+    "duration": "۶ ساعت ۰۵ دقیقه", "durationSec": 21900
+  },
+  {
+    "id": 6, "slug": "crime-and-punishment", "genre": "roman",
+    "title": "جنایت و مکافات", "author": "فئودور داستایفسکی", "narrator": "با صدای رضا کریمی",
+    "cover": "🗡️", "coverBg": "linear-gradient(135deg,#0D2A4A,#194878)",
+    "tag": "رمان و داستان", "rate": "۴.۵",
+    "mode": "chapters",
+    "chapters": [
+      { "title": "فصل ۱", "file": "audio/cp-ch1.mp3", "durationSec": 5400 },
+      { "title": "فصل ۲", "file": "audio/cp-ch2.mp3", "durationSec": 5100 },
+      { "title": "فصل ۳", "file": "audio/cp-ch3.mp3", "durationSec": 4800 },
+      { "title": "فصل ۴", "file": "audio/cp-ch4.mp3", "durationSec": 4950 },
+      { "title": "فصل ۵", "file": "audio/cp-ch5.mp3", "durationSec": 4650 },
+      { "title": "فصل ۶", "file": "audio/cp-ch6.mp3", "durationSec": 5250 }
+    ],
+    "duration": "۱۲ ساعت ۱۵ دقیقه", "durationSec": 44100
+  },
+  {
+    "id": 7, "slug": "atomic-habits", "genre": "personal",
+    "title": "عادت‌های اتمی", "author": "جیمز کلیر", "narrator": "با صدای سارا احمدی",
+    "cover": "⚡", "coverBg": "linear-gradient(135deg,#11569A,#7EC8FF)",
+    "tag": "توسعه فردی", "rate": "۴.۷",
+    "mode": "single",
+    "audioFile": "audio/atomic-habits.mp3",
+    "duration": "۴ ساعت ۳۰ دقیقه", "durationSec": 16200
+  },
+  {
+    "id": 8, "slug": "shahnameh", "genre": "history",
+    "title": "شاهنامه فردوسی", "author": "ابوالقاسم فردوسی", "narrator": "با صدای محمد رضایی",
+    "cover": "🏹", "coverBg": "linear-gradient(135deg,#194878,#1873C4)",
+    "tag": "تاریخ و فلسفه", "rate": "۴.۴",
+    "mode": "chapters",
+    "chapters": [
+      { "title": "داستان رستم و سهراب", "file": "audio/shahnameh-rostam-sohrab.mp3", "durationSec": 5400 },
+      { "title": "داستان سیاوش", "file": "audio/shahnameh-siavash.mp3", "durationSec": 4800 },
+      { "title": "داستان ضحاک", "file": "audio/shahnameh-zahhak.mp3", "durationSec": 3900 }
+    ],
+    "duration": "۷ ساعت ۴۰ دقیقه", "durationSec": 27600
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "featured": {
+    "title": "قسمت ۱۲ — سفر در سپیان با یووال نوح هراری",
+    "desc": "در این قسمت، داستان انسان از عصر شکار تا انقلاب دیجیتال را روایت می‌کنیم و نگاهی نقادانه به ایده‌های هراری می‌اندازیم.",
+    "audioFile": "audio/podcast-ep12.mp3",
+    "durationSec": 2600
+  },
+  "episodes": [
+    { "num": "۱۲", "title": "قسمت ۱۲ — سفر در سپیان با یووال نوح هراری", "audioFile": "audio/podcast-ep12.mp3", "durationSec": 2600, "date": "این هفته" },
+    { "num": "۱۱", "title": "بوف کور و دنیای هذیانی هدایت", "audioFile": "audio/podcast-ep11.mp3", "durationSec": 2292, "date": "۲ هفته پیش" },
+    { "num": "۱۰", "title": "قدرت حال — زندگی در همین لحظه", "audioFile": "audio/podcast-ep10.mp3", "durationSec": 1965, "date": "۳ هفته پیش" },
+    { "num": "۰۹", "title": "حافظ و راز غزل‌های جاودان", "audioFile": "audio/podcast-ep09.mp3", "durationSec": 2700, "date": "۱ ماه پیش" },
+    { "num": "۰۸", "title": "عادت‌های اتمی؛ تغییرات کوچک", "audioFile": "audio/podcast-ep08.mp3", "durationSec": 1790, "date": "۱ ماه پیش" },
+    { "num": "۰۷", "title": "جنایت و مکافات داستایفسکی", "audioFile": "audio/podcast-ep07.mp3", "durationSec": 3080, "date": "۲ ماه پیش" },
+    { "num": "۰۶", "title": "شاهنامه؛ هویتی در شعر", "audioFile": "audio/podcast-ep06.mp3", "durationSec": 2415, "date": "۲ ماه پیش" }
+  ]
+}

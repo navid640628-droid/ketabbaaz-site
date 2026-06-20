@@ -1,0 +1,8 @@
+{
+  "name": "ketabbaaz-site",
+  "version": "1.0.0",
+  "description": "سایت کتاب‌باز — ساخته‌شده با اسکریپت build.js از روی فایل‌های JSON",
+  "scripts": {
+    "build": "node build.js"
+  }
+}
