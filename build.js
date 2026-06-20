@@ -8,7 +8,7 @@ const path = require('path');
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
-const SITE_URL = 'https://YOUR-DOMAIN.com'; // ← بعد از خرید دامین این رو عوض کن
+const SITE_URL = 'https://ucab.ir'; // ← بعد از خرید دامین این رو عوض کن
 
 // ───────── خواندن داده‌ها ─────────
 const books = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/books.json'), 'utf-8'));
