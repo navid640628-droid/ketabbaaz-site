@@ -10,9 +10,9 @@ const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
 // ═══════════════════════════════════════════════════════
 // کتاب‌باز — اسکریپت ساخت سایت (build.js)
-// نسخه: v2.1 — شامل جستجوی fuzzy، رنگ‌های متنوع کاور، پادکست مدرن
+// نسخه: v2.2 — صفحه کتاب صوتی با ساختار سایدبار یکسان با صفحه کتاب‌ها (رفع باگ فیلتر و جستجو)
 // ═══════════════════════════════════════════════════════
-const SITE_URL = 'https://ucab.ir'; // ← بعد از خرید دامین این رو عوض کن
+const SITE_URL = 'https://YOUR-DOMAIN.com'; // ← بعد از خرید دامین این رو عوض کن
 
 // ───────── خواندن داده‌ها ─────────
 const books = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/books.json'), 'utf-8'));
@@ -119,7 +119,7 @@ function renderFooter(depth = 0) {
     <a href="${p}audiobooks.html">کتاب صوتی</a>
     <a href="https://t.me/kmketab" target="_blank">کانال تلگرام</a>
   </div>
-  <p style="font-size:0.75rem; margin-top:1rem; opacity:0.4">© ۱۴۰۳ کتاب‌باز · با ❤️ برای کتاب‌دوستان · نسخه سایت: v2.1</p>
+  <p style="font-size:0.75rem; margin-top:1rem; opacity:0.4">© ۱۴۰۳ کتاب‌باز · با ❤️ برای کتاب‌دوستان · نسخه سایت: v2.2</p>
 </footer>`;
 }
 
@@ -647,6 +647,10 @@ function audiobookCardHtml(b, depth) {
 
 function buildAudiobooksListPage() {
   const cardsHtml = audiobooks.map(b => audiobookCardHtml(b, 0)).join('\n');
+  const genreNamesAb = {
+    all: 'همه کتاب‌های صوتی', roman: 'رمان و داستان', science: 'علمی و آموزشی',
+    personal: 'توسعه فردی', history: 'تاریخ و فلسفه', poetry: 'شعر و ادبیات'
+  };
   const html = `<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -671,21 +675,32 @@ ${renderNav(0, 'audiobooks')}
 
 <section id="library">
   <div class="section-inner">
-    <div class="search-box-wrap reveal">
-      <span class="search-box-icon">🔍</span>
-      <input type="text" id="audioSearchInput" class="search-box-input" placeholder="نام کتاب صوتی یا نویسنده را بنویسید... (حتی تقریبی)">
-      <button class="search-box-clear" id="audioSearchClear" title="پاک کردن">✕</button>
+    <div class="library-layout">
+      <div class="filter-sidebar reveal">
+        <div class="sidebar-title">📚 ژانر</div>
+        <div class="filter-bar" id="genreFilter">
+          <button class="filter-btn active" data-genre="all">🔍 همه کتاب‌های صوتی</button>
+          <button class="filter-btn" data-genre="roman">📖 رمان و داستان</button>
+          <button class="filter-btn" data-genre="science">🔬 علمی و آموزشی</button>
+          <button class="filter-btn" data-genre="personal">🌱 توسعه فردی</button>
+          <button class="filter-btn" data-genre="history">🏛️ تاریخ و فلسفه</button>
+          <button class="filter-btn" data-genre="poetry">🌺 شعر و ادبیات</button>
+        </div>
+      </div>
+
+      <div class="library-main">
+        <div class="search-box-wrap reveal">
+          <span class="search-box-icon">🔍</span>
+          <input type="text" id="audioSearchInput" class="search-box-input" placeholder="نام کتاب صوتی یا نویسنده را بنویسید... (حتی تقریبی)">
+          <button class="search-box-clear" id="audioSearchClear" title="پاک کردن">✕</button>
+        </div>
+        <div class="library-top-bar reveal">
+          <div class="active-genre-label">نمایش: <span id="activeGenreLabel">همه کتاب‌های صوتی</span></div>
+        </div>
+        <div class="no-results" id="noResults"><div class="nr-icon">📭</div><p>کتاب صوتی‌ای با این مشخصات پیدا نشد</p></div>
+        <div class="audiobook-grid" id="audiobookGrid">${cardsHtml}</div>
+      </div>
     </div>
-    <div class="audio-filter-bar reveal" id="genreFilter">
-      <button class="audio-filter-btn active" data-genre="all">🔍 همه</button>
-      <button class="audio-filter-btn" data-genre="roman">📖 رمان و داستان</button>
-      <button class="audio-filter-btn" data-genre="science">🔬 علمی و آموزشی</button>
-      <button class="audio-filter-btn" data-genre="personal">🌱 توسعه فردی</button>
-      <button class="audio-filter-btn" data-genre="history">🏛️ تاریخ و فلسفه</button>
-      <button class="audio-filter-btn" data-genre="poetry">🌺 شعر و ادبیات</button>
-    </div>
-    <div class="no-results" id="noResults"><div class="nr-icon">📭</div><p>کتاب صوتی‌ای با این مشخصات پیدا نشد</p></div>
-    <div class="audiobook-grid" id="audiobookGrid">${cardsHtml}</div>
   </div>
 </section>
 
@@ -693,42 +708,54 @@ ${renderFooter(0)}
 
 <script>
 ${fuzzySearchScript()}
-const wave = document.getElementById('heroWave');
-for (let i=0;i<24;i++){const bar=document.createElement('span');bar.style.animationDelay=(i*0.08)+'s';wave.appendChild(bar);}
+document.addEventListener('DOMContentLoaded', function () {
+  const genreNames = ${JSON.stringify(genreNamesAb)};
+  const wave = document.getElementById('heroWave');
+  for (let i=0;i<24;i++){const bar=document.createElement('span');bar.style.animationDelay=(i*0.08)+'s';wave.appendChild(bar);}
 
-let activeGenre='all', searchQuery='';
-function applyFilter(){
-  const cards=Array.from(document.querySelectorAll('#audiobookGrid .audiobook-card'));
-  const shouldShow=c=>{
-    const g = activeGenre==='all'||c.dataset.genre===activeGenre;
-    const s = !searchQuery || fuzzyMatch(searchQuery, c.dataset.title) || fuzzyMatch(searchQuery, c.dataset.author);
-    return g && s;
-  };
-  const toShow=cards.filter(shouldShow), toHide=cards.filter(c=>!shouldShow(c));
-  toHide.forEach(c=>{c.classList.remove('hide-card');c.classList.add('fading-out');});
-  setTimeout(()=>{
-    toHide.forEach(c=>{c.classList.add('hide-card');c.classList.remove('fading-out');});
-    toShow.forEach(c=>c.classList.remove('hide-card','fading-out'));
-    document.getElementById('noResults').style.display=toShow.length===0?'block':'none';
-  },350);
-}
+  let activeGenre='all', searchQuery='';
 
-const audioSearchInput = document.getElementById('audioSearchInput');
-const audioSearchClear = document.getElementById('audioSearchClear');
-audioSearchInput.addEventListener('input', () => {
-  searchQuery = audioSearchInput.value.trim();
-  audioSearchClear.classList.toggle('show', searchQuery.length > 0);
+  function applyFilter(){
+    const cards=Array.from(document.querySelectorAll('#audiobookGrid .audiobook-card'));
+    const shouldShow=function(c){
+      const g = activeGenre==='all'||c.dataset.genre===activeGenre;
+      const s = !searchQuery || fuzzyMatch(searchQuery, c.dataset.title) || fuzzyMatch(searchQuery, c.dataset.author);
+      return g && s;
+    };
+    const toShow=cards.filter(shouldShow), toHide=cards.filter(function(c){return !shouldShow(c);});
+    toHide.forEach(function(c){c.classList.remove('hide-card');c.classList.add('fading-out');});
+    setTimeout(function(){
+      toHide.forEach(function(c){c.classList.add('hide-card');c.classList.remove('fading-out');});
+      toShow.forEach(function(c){c.classList.remove('hide-card','fading-out');});
+      document.getElementById('noResults').style.display=toShow.length===0?'block':'none';
+    },350);
+    document.getElementById('activeGenreLabel').textContent = (searchQuery ? ('جستجو: «' + searchQuery + '» — ') : '') + (genreNames[activeGenre] || 'همه کتاب‌های صوتی');
+  }
+
+  const audioSearchInput = document.getElementById('audioSearchInput');
+  const audioSearchClear = document.getElementById('audioSearchClear');
+  audioSearchInput.addEventListener('input', function () {
+    searchQuery = audioSearchInput.value.trim();
+    audioSearchClear.classList.toggle('show', searchQuery.length > 0);
+    applyFilter();
+  });
+  audioSearchClear.addEventListener('click', function () {
+    audioSearchInput.value = ''; searchQuery = '';
+    audioSearchClear.classList.remove('show');
+    applyFilter();
+    audioSearchInput.focus();
+  });
+
+  document.querySelectorAll('#genreFilter .filter-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#genreFilter .filter-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      activeGenre = btn.dataset.genre;
+      applyFilter();
+    });
+  });
+
   applyFilter();
-});
-audioSearchClear.addEventListener('click', () => {
-  audioSearchInput.value = ''; searchQuery = '';
-  audioSearchClear.classList.remove('show');
-  applyFilter();
-  audioSearchInput.focus();
-});
-
-document.querySelectorAll('#genreFilter .audio-filter-btn').forEach(btn=>{
-  btn.onclick=()=>{document.querySelectorAll('#genreFilter .audio-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeGenre=btn.dataset.genre;applyFilter();};
 });
 </script>
 ${revealScript()}
