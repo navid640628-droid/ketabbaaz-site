@@ -8,7 +8,11 @@ const path = require('path');
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
-const SITE_URL = 'https://ucab.ir'; // ← بعد از خرید دامین این رو عوض کن
+// ═══════════════════════════════════════════════════════
+// کتاب‌باز — اسکریپت ساخت سایت (build.js)
+// نسخه: v2.1 — شامل جستجوی fuzzy، رنگ‌های متنوع کاور، پادکست مدرن
+// ═══════════════════════════════════════════════════════
+const SITE_URL = 'https://YOUR-DOMAIN.com'; // ← بعد از خرید دامین این رو عوض کن
 
 // ───────── خواندن داده‌ها ─────────
 const books = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/books.json'), 'utf-8'));
@@ -115,7 +119,7 @@ function renderFooter(depth = 0) {
     <a href="${p}audiobooks.html">کتاب صوتی</a>
     <a href="https://t.me/kmketab" target="_blank">کانال تلگرام</a>
   </div>
-  <p style="font-size:0.75rem; margin-top:1rem; opacity:0.4">© ۱۴۰۳ کتاب‌باز · با ❤️ برای کتاب‌دوستان</p>
+  <p style="font-size:0.75rem; margin-top:1rem; opacity:0.4">© ۱۴۰۳ کتاب‌باز · با ❤️ برای کتاب‌دوستان · نسخه سایت: v2.1</p>
 </footer>`;
 }
 
@@ -132,6 +136,41 @@ document.querySelectorAll('#navLinks a').forEach(a=>a.onclick=()=>document.getEl
 function starsHtml(rate) {
   const full = Math.round(rate);
   return '★★★★★'.split('').map((s, i) => i < full ? '★' : '☆').join('');
+}
+
+// تابع جستجوی تقریبی (fuzzy) — برای استفاده در صفحه کتاب‌ها و کتاب‌های صوتی
+function fuzzySearchScript() {
+  return `
+function normalizeFa(s){
+  return String(s||'')
+    .replace(/[\\u064B-\\u065F\\u0670\\u06D6-\\u06ED]/g,'')
+    .replace(/ك/g,'ک').replace(/ي/g,'ی').replace(/ـ/g,'')
+    .replace(/\\s+/g,' ').trim().toLowerCase();
+}
+function levenshtein(a,b){
+  const m=a.length,n=b.length;
+  if(!m) return n; if(!n) return m;
+  const dp=[];
+  for(let i=0;i<=m;i++){dp.push(new Array(n+1).fill(0));dp[i][0]=i;}
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    dp[i][j]= a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+function fuzzyMatch(query,target){
+  query=normalizeFa(query); target=normalizeFa(target);
+  if(!query) return true;
+  if(target.includes(query)) return true;
+  let qi=0;
+  for(let i=0;i<target.length && qi<query.length;i++) if(target[i]===query[qi]) qi++;
+  if(qi===query.length) return true;
+  const words=target.split(' ');
+  const threshold=Math.max(1,Math.floor(query.length/3));
+  for(const w of words){
+    if(Math.abs(w.length-query.length)<=threshold+2 && levenshtein(query,w)<=threshold) return true;
+  }
+  return false;
+}`;
 }
 
 function bookCardHtml(b, depth) {
@@ -371,6 +410,11 @@ ${renderNav(0, 'books')}
       </div>
 
       <div class="library-main">
+        <div class="search-box-wrap reveal">
+          <span class="search-box-icon">🔍</span>
+          <input type="text" id="bookSearchInput" class="search-box-input" placeholder="نام کتاب یا نویسنده را بنویسید... (حتی تقریبی)">
+          <button class="search-box-clear" id="bookSearchClear" title="پاک کردن">✕</button>
+        </div>
         <div class="library-top-bar reveal">
           <div class="active-genre-label">نمایش: <span id="activeGenreLabel">همه کتاب‌ها</span></div>
         </div>
@@ -389,7 +433,8 @@ ${renderNav(0, 'books')}
 ${renderFooter(0)}
 
 <script>
-let activeGenre = 'all', activeLang = 'all', activeTop = 'all';
+${fuzzySearchScript()}
+let activeGenre = 'all', activeLang = 'all', activeTop = 'all', searchQuery = '';
 const genreNames = ${JSON.stringify(genreNames)};
 
 // از URL اولیه (مثلا books.html?genre=roman) فیلتر اولیه رو بخون
@@ -402,7 +447,8 @@ function applyFilter(){
     const g = activeGenre==='all' || c.dataset.genre===activeGenre;
     const l = activeLang==='all' || c.dataset.lang===activeLang;
     const t = activeTop==='all' || c.dataset.top==='true';
-    return g && l && t;
+    const s = !searchQuery || fuzzyMatch(searchQuery, c.dataset.title) || fuzzyMatch(searchQuery, c.dataset.author);
+    return g && l && t && s;
   };
   const toShow = cards.filter(shouldShow);
   const toHide = cards.filter(c=>!shouldShow(c));
@@ -412,8 +458,22 @@ function applyFilter(){
     toShow.forEach(c=>c.classList.remove('hide-card','fading-out'));
     document.getElementById('noResults').style.display = toShow.length===0?'block':'none';
   },350);
-  document.getElementById('activeGenreLabel').textContent = genreNames[activeGenre] || 'همه کتاب‌ها';
+  document.getElementById('activeGenreLabel').textContent = (searchQuery ? ('جستجو: «' + searchQuery + '» — ') : '') + (genreNames[activeGenre] || 'همه کتاب‌ها');
 }
+
+const searchInput = document.getElementById('bookSearchInput');
+const searchClear = document.getElementById('bookSearchClear');
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value.trim();
+  searchClear.classList.toggle('show', searchQuery.length > 0);
+  applyFilter();
+});
+searchClear.addEventListener('click', () => {
+  searchInput.value = ''; searchQuery = '';
+  searchClear.classList.remove('show');
+  applyFilter();
+  searchInput.focus();
+});
 
 document.querySelectorAll('#genreFilter .filter-btn').forEach(btn=>{
   if (btn.dataset.genre === activeGenre) { document.querySelectorAll('#genreFilter .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
@@ -440,12 +500,13 @@ buildBooksListPage();
 // ═══════════════════════════════════════════════════════
 function buildPodcastPage() {
   const f = podcast.featured;
+  const totalEpisodes = podcast.episodes.length;
   const episodesHtml = podcast.episodes.map((ep, i) => `
-    <div class="pp-ep-item${i===0?' playing':''}" data-audio="${ep.audioFile}" data-title="${escapeHtml(ep.title)}" data-dur="${ep.durationSec}">
+    <div class="pp-ep-item${i===0?' playing':''}" data-audio="${ep.audioFile}" data-title="${escapeHtml(ep.title)}" data-desc="" data-dur="${ep.durationSec}">
       <div class="pp-ep-num">${ep.num}</div>
-      <div style="flex:1;min-width:0">
+      <div class="pp-ep-body">
         <div class="pp-ep-title">${escapeHtml(ep.title)}</div>
-        <div class="pp-ep-meta">${ep.date}</div>
+        <div class="pp-ep-meta"><span>⏱ ${Math.round(ep.durationSec/60)} دقیقه</span><span class="dot">•</span><span>${ep.date}</span></div>
       </div>
       <span class="pp-ep-play-icon">▶</span>
     </div>`).join('');
@@ -463,43 +524,70 @@ ${renderHead({
 <body>
 ${renderNav(0, 'podcast')}
 
-<section class="podcast-page-player">
+<section class="podcast-hero">
+  <div class="podcast-hero-content">
+    <div class="podcast-hero-badge">🎙️ پادکست هفتگی</div>
+    <h1>پادکست <span>کتاب‌باز</span></h1>
+    <p>هر هفته یک کتاب، یک گفتگو، یک نگاه تازه — همراه با صدای کتاب‌باز.</p>
+    <div class="podcast-hero-stats">
+      <div class="phs-item"><span class="phs-num">${totalEpisodes}</span><span class="phs-lbl">قسمت</span></div>
+      <div class="phs-divider"></div>
+      <div class="phs-item"><span class="phs-num">هفتگی</span><span class="phs-lbl">انتشار</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="podcast-player-wrap">
   <div class="pp-player-card">
     <div class="pp-now-playing">
-      <div class="pp-cover">🎧</div>
+      <div class="pp-cover">
+        <span class="pp-eq" id="ppEq"><span></span><span></span><span></span><span></span></span>
+        🎧
+      </div>
       <div class="pp-np-info">
+        <span class="pp-np-tag">در حال پخش</span>
         <div class="pp-np-title" id="npTitle">${escapeHtml(f.title)}</div>
         <div class="pp-np-desc" id="npDesc">${escapeHtml(f.desc)}</div>
       </div>
+    </div>
+    <div class="pp-progress-wrap">
+      <div class="pp-bar" id="ppBar"><div class="pp-bar-fill" id="ppBarFill"></div></div>
+      <div class="pp-time-row"><span id="ppCurrent">۰۰:۰۰</span><span id="ppTotal">۰۰:۰۰</span></div>
     </div>
     <div class="pp-controls">
       <button class="pp-btn-seek" onclick="seek(-30)">⏪<span class="lbl">۳۰ ثانیه</span></button>
       <button class="pp-btn-main" id="ppPlayBtn" onclick="togglePlay()">▶</button>
       <button class="pp-btn-seek" onclick="seek(30)">⏩<span class="lbl">۳۰ ثانیه</span></button>
     </div>
-    <div class="pp-progress-wrap">
-      <div class="pp-bar" id="ppBar"><div class="pp-bar-fill" id="ppBarFill"></div></div>
-      <div class="pp-time-row"><span id="ppCurrent">۰۰:۰۰</span><span id="ppTotal">۰۰:۰۰</span></div>
-    </div>
     <audio id="ppAudio" src="${f.audioFile}" preload="metadata"></audio>
   </div>
-</section>
-
-<div class="pp-episode-list">
-  <h2 class="section-title" style="font-size:1.3rem;margin-bottom:1.5rem">همه قسمت‌ها</h2>
-  ${episodesHtml}
-  <div class="share-row" style="margin-top:1.5rem">
-    <a href="https://t.me/kmketab" target="_blank" class="share-btn">✈️ دنبال کردن در تلگرام</a>
-  </div>
 </div>
+
+<section class="podcast-episodes-section">
+  <div class="section-inner" style="max-width:760px">
+    <div class="section-header-row reveal">
+      <h2 class="section-title" style="margin-bottom:0">همه قسمت‌ها</h2>
+      <span class="ep-count-pill">${totalEpisodes} قسمت</span>
+    </div>
+    <div class="pp-episode-list">
+      ${episodesHtml}
+    </div>
+    <div class="podcast-platforms reveal">
+      <a href="https://t.me/kmketab" target="_blank" class="podcast-platform-btn">✈️ دنبال کردن در تلگرام</a>
+      <a href="#" class="podcast-platform-btn">🎵 کست‌باکس</a>
+      <a href="#" class="podcast-platform-btn">🟢 اسپاتیفای</a>
+    </div>
+  </div>
+</section>
 
 ${renderFooter(0)}
 
 <script>
 const audio = document.getElementById('ppAudio');
 const playBtn = document.getElementById('ppPlayBtn');
+const eqEl = document.getElementById('ppEq');
 function fmt(sec){sec=Math.max(0,Math.floor(sec));const m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
-function togglePlay(){ if(audio.paused){audio.play();playBtn.textContent='❙❙';} else {audio.pause();playBtn.textContent='▶';} }
+function togglePlay(){ if(audio.paused){audio.play();playBtn.textContent='❙❙';eqEl.classList.add('live');} else {audio.pause();playBtn.textContent='▶';eqEl.classList.remove('live');} }
 function seek(d){ audio.currentTime = Math.max(0, audio.currentTime + d); }
 audio.addEventListener('timeupdate',()=>{
   const pct = audio.duration ? (audio.currentTime/audio.duration*100) : 0;
@@ -507,7 +595,7 @@ audio.addEventListener('timeupdate',()=>{
   document.getElementById('ppCurrent').textContent = fmt(audio.currentTime);
 });
 audio.addEventListener('loadedmetadata',()=>{ document.getElementById('ppTotal').textContent = fmt(audio.duration); });
-audio.addEventListener('ended',()=>{ playBtn.textContent='▶'; });
+audio.addEventListener('ended',()=>{ playBtn.textContent='▶'; eqEl.classList.remove('live'); });
 document.getElementById('ppBar').onclick = (e)=>{
   const rect = e.currentTarget.getBoundingClientRect();
   const ratio = 1 - ((e.clientX-rect.left)/rect.width); // RTL
@@ -520,7 +608,7 @@ document.querySelectorAll('.pp-ep-item').forEach(item=>{
     audio.src = item.dataset.audio;
     document.getElementById('npTitle').textContent = item.dataset.title;
     document.getElementById('npDesc').textContent = 'در حال پخش از لیست قسمت‌ها';
-    audio.play(); playBtn.textContent='❙❙';
+    audio.play(); playBtn.textContent='❙❙'; eqEl.classList.add('live');
     window.scrollTo({top:0,behavior:'smooth'});
   };
 });
@@ -538,7 +626,7 @@ buildPodcastPage();
 // ═══════════════════════════════════════════════════════
 function audiobookCardHtml(b, depth) {
   const p = depth > 0 ? '../'.repeat(depth) : '';
-  return `<a href="${p}${audiobookUrl(b)}" class="audiobook-card reveal" data-genre="${b.genre}" style="text-decoration:none;color:inherit;display:block">
+  return `<a href="${p}${audiobookUrl(b)}" class="audiobook-card reveal" data-genre="${b.genre}" data-title="${escapeHtml(b.title)}" data-author="${escapeHtml(b.author)}" style="text-decoration:none;color:inherit;display:block">
     <div class="audiobook-cover-wrap" style="background:${b.coverBg}">
       ${b.cover}
       <span class="narrator-badge">${b.narrator}</span>
@@ -583,6 +671,11 @@ ${renderNav(0, 'audiobooks')}
 
 <section id="library">
   <div class="section-inner">
+    <div class="search-box-wrap reveal">
+      <span class="search-box-icon">🔍</span>
+      <input type="text" id="audioSearchInput" class="search-box-input" placeholder="نام کتاب صوتی یا نویسنده را بنویسید... (حتی تقریبی)">
+      <button class="search-box-clear" id="audioSearchClear" title="پاک کردن">✕</button>
+    </div>
     <div class="audio-filter-bar reveal" id="genreFilter">
       <button class="audio-filter-btn active" data-genre="all">🔍 همه</button>
       <button class="audio-filter-btn" data-genre="roman">📖 رمان و داستان</button>
@@ -599,13 +692,18 @@ ${renderNav(0, 'audiobooks')}
 ${renderFooter(0)}
 
 <script>
+${fuzzySearchScript()}
 const wave = document.getElementById('heroWave');
 for (let i=0;i<24;i++){const bar=document.createElement('span');bar.style.animationDelay=(i*0.08)+'s';wave.appendChild(bar);}
 
-let activeGenre='all';
+let activeGenre='all', searchQuery='';
 function applyFilter(){
   const cards=Array.from(document.querySelectorAll('#audiobookGrid .audiobook-card'));
-  const shouldShow=c=>activeGenre==='all'||c.dataset.genre===activeGenre;
+  const shouldShow=c=>{
+    const g = activeGenre==='all'||c.dataset.genre===activeGenre;
+    const s = !searchQuery || fuzzyMatch(searchQuery, c.dataset.title) || fuzzyMatch(searchQuery, c.dataset.author);
+    return g && s;
+  };
   const toShow=cards.filter(shouldShow), toHide=cards.filter(c=>!shouldShow(c));
   toHide.forEach(c=>{c.classList.remove('hide-card');c.classList.add('fading-out');});
   setTimeout(()=>{
@@ -614,6 +712,21 @@ function applyFilter(){
     document.getElementById('noResults').style.display=toShow.length===0?'block':'none';
   },350);
 }
+
+const audioSearchInput = document.getElementById('audioSearchInput');
+const audioSearchClear = document.getElementById('audioSearchClear');
+audioSearchInput.addEventListener('input', () => {
+  searchQuery = audioSearchInput.value.trim();
+  audioSearchClear.classList.toggle('show', searchQuery.length > 0);
+  applyFilter();
+});
+audioSearchClear.addEventListener('click', () => {
+  audioSearchInput.value = ''; searchQuery = '';
+  audioSearchClear.classList.remove('show');
+  applyFilter();
+  audioSearchInput.focus();
+});
+
 document.querySelectorAll('#genreFilter .audio-filter-btn').forEach(btn=>{
   btn.onclick=()=>{document.querySelectorAll('#genreFilter .audio-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeGenre=btn.dataset.genre;applyFilter();};
 });
