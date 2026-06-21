@@ -915,6 +915,8 @@
   .book-card { transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.3s; }
   .book-card.fading-out { opacity: 0 !important; transform: scale(0.88) !important; pointer-events: none; }
   .book-card.hide-card { display: none !important; }
+  .audiobook-card.fading-out { opacity: 0 !important; transform: scale(0.88) !important; pointer-events: none; }
+  .audiobook-card.hide-card { display: none !important; }
 
   /* grid wrapper for filtering */
   @keyframes pulse-ring {

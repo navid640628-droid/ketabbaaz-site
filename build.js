@@ -10,9 +10,9 @@ const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
 // ═══════════════════════════════════════════════════════
 // کتاب‌باز — اسکریپت ساخت سایت (build.js)
-// نسخه: v2.2 — صفحه کتاب صوتی با ساختار سایدبار یکسان با صفحه کتاب‌ها (رفع باگ فیلتر و جستجو)
+// نسخه: v2.3 — رفع باگ مهم: قانون CSS برای محو/جمع‌شدن کارت‌های کتاب صوتی اضافه شد
 // ═══════════════════════════════════════════════════════
-const SITE_URL = 'https://ucab.ir'; // ← بعد از خرید دامین این رو عوض کن
+const SITE_URL = 'https://YOUR-DOMAIN.com'; // ← بعد از خرید دامین این رو عوض کن
 
 // ───────── خواندن داده‌ها ─────────
 const books = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/books.json'), 'utf-8'));
@@ -119,7 +119,7 @@ function renderFooter(depth = 0) {
     <a href="${p}audiobooks.html">کتاب صوتی</a>
     <a href="https://t.me/kmketab" target="_blank">کانال تلگرام</a>
   </div>
-  <p style="font-size:0.75rem; margin-top:1rem; opacity:0.4">© ۱۴۰۳ کتاب‌باز · با ❤️ برای کتاب‌دوستان · نسخه سایت: v2.2</p>
+  <p style="font-size:0.75rem; margin-top:1rem; opacity:0.4">© ۱۴۰۳ کتاب‌باز · با ❤️ برای کتاب‌دوستان · نسخه سایت: v2.3</p>
 </footer>`;
 }
 
