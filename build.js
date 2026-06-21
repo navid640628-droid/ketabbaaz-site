@@ -12,7 +12,7 @@ const DIST = path.join(ROOT, 'dist');
 // کتاب‌باز — اسکریپت ساخت سایت (build.js)
 // نسخه: v2.1 — شامل جستجوی fuzzy، رنگ‌های متنوع کاور، پادکست مدرن
 // ═══════════════════════════════════════════════════════
-const SITE_URL = 'https://YOUR-DOMAIN.com'; // ← بعد از خرید دامین این رو عوض کن
+const SITE_URL = 'https://ucab.ir'; // ← بعد از خرید دامین این رو عوض کن
 
 // ───────── خواندن داده‌ها ─────────
 const books = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/books.json'), 'utf-8'));
